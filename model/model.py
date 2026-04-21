@@ -11,7 +11,14 @@ class Model:
         return MeteoDao().get_umidita_media(mese)
 
     def calcola_sequenza(self, mese):
-        self._dati_meteo = MeteoDao.get_tutti_meteo_mese(mese)
+        dati = MeteoDao.get_tutti_meteo_mese(mese)
+
+        # raggruppo per giorno
+        self._dati_giornalieri = []
+        giorni = sorted(set(d.data for d in dati))
+
+        for g in giorni:
+            self._dati_giornalieri.append([d for d in dati if d.data == g])
         self._best_sequenza = []
         self._best_costo = float("inf")
         self._ricorsione([], 0)
@@ -65,9 +72,4 @@ class Model:
         return costo
 
     def _get_citta_giorno(self, giorno):
-        # Ritorna le 3 città disponibili per il giorno specificato (0-14)
-        # I dati nel DB sono ordinati per data, quindi i primi 3 record sono il giorno 1, ecc.
-        data_giorno = self._dati_meteo[giorno * 3].data
-        return [s for s in self._dati_meteo if s.data == data_giorno]
-
-
+        return self._dati_giornalieri[giorno]
