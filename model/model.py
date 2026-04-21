@@ -19,7 +19,7 @@ class Model:
 
     # PARZIALE: lista delle città visitate finora
     # LIVELLO: indica in quale giorno ci troviamo
-    def ricorsione(self, parziale, livello):
+    def _ricorsione(self, parziale, livello):
         # condizione terminale: se siamo al 15esimo giorno calcola tutta la trasferta
         if livello == 15:
             costo = self._calcola_costo(parziale)
@@ -28,14 +28,13 @@ class Model:
                 self._best_sequenza = list(parziale)
             return
         # condizione ricorsiva: l'esploratore deve decidere tra Milano, Torino e Genova
-        citta_possibili = self._get_citta_giorno(livello)
-        for prova in citta_possibili:
-            if self._vincoli_soddisfatti(parziale, prova):
-                parziale.append(prova) # aggiungo la città alla sequenza
+        for citta in self._get_citta_giorno(livello):
+            if self._vincoli_soddisfatti(parziale, citta):
+                parziale.append(citta) # aggiungo la città alla sequenza
                 self._ricorsione(parziale, livello + 1)  # ricorsione sulle componenti future
                 parziale.pop()
 
-    def vincoli_soddisfatti(self, parziale, citta):
+    def _vincoli_soddisfatti(self, parziale, citta):
         count = 0
         for fermata in parziale:
             if fermata.localita == citta.localita:
@@ -48,16 +47,15 @@ class Model:
             return True # il primo giorno puoi andare dove vuoi
 
         if livello < 3:
-            return citta.localita == parziale[0].localita # limite minimo di 3 giorni, non può andare in un'altra città
+            return citta.localita == parziale[-1].localita # limite minimo di 3 giorni, non può andare in un'altra città
 
         # Per poter cambiare città, dobbiamo averne fatte 3 uguali prima
-        if citta.localita != parziale[livello-1].localita:
-            if (parziale[livello-1].localita != parziale[livello-2].localita) or \
-                (parziale[livello - 2].localita != parziale[livello - 3].località):
+        if citta.localita != parziale[-1].localita:
+            if not (parziale[-1].localita == parziale[-2].localita == parziale[-3].localita):
                 return False # se non abbiamo fatto ancora tre giorni fissi non si può cambiare
+        return True
 
-
-    def calcola_costo(self, parziale):
+    def _calcola_costo(self, parziale):
         costo = 0
         for i in range(len(parziale)):
             costo += parziale[i].umidita # costo variabile
@@ -69,7 +67,7 @@ class Model:
     def _get_citta_giorno(self, giorno):
         # Ritorna le 3 città disponibili per il giorno specificato (0-14)
         # I dati nel DB sono ordinati per data, quindi i primi 3 record sono il giorno 1, ecc.
-        return self._dati_meteo[giorno * 3: giorno * 3 + 3]
-
+        data_giorno = self._dati_meteo[giorno * 3].data
+        return [s for s in self._dati_meteo if s.data == data_giorno]
 
 

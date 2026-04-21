@@ -52,9 +52,9 @@ class MeteoDao():
             cursor = cnx.cursor(dictionary=True)
             # Prendiamo Torino, Milano, Genova per i primi 15 giorni del mese
             query = """SELECT Localita, Data, Umidita 
-                           FROM situazione 
-                           WHERE MONTH(Data) = %s AND DAY(Data) <= 15
-                           ORDER BY Data ASC, Localita ASC"""
+                        FROM situazione 
+                        WHERE MONTH(Data) = %s AND DAY(Data) <= 15
+                        ORDER BY Data ASC, Localita ASC"""
             cursor.execute(query, (mese,))
             for row in cursor:
                 result.append(Situazione(row["Localita"], row["Data"], row["Umidita"]))

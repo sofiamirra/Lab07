@@ -32,7 +32,7 @@ class Controller:
             return
         sequenza_ottima, costo_minimo = self._model.calcola_sequenza(self._mese) # chiamiamo la ricorsione
         self._view.lst_result.controls.clear()
-        self._view.lst_result.controls.append(ft.Text(f"Coato totale: {costo_minimo}"))
+        self._view.lst_result.controls.append(ft.Text(f"Costo totale: {costo_minimo}"))
         for s in sequenza_ottima:
             self._view.lst_result.controls.append(ft.Text(str(s)))
         self._view.update_page()
