@@ -13,12 +13,13 @@ class Model:
     def calcola_sequenza(self, mese):
         dati = MeteoDao.get_tutti_meteo_mese(mese)
 
-        # raggruppo per giorno
         self._dati_giornalieri = []
         giorni = sorted(set(d.data for d in dati))
 
         for g in giorni:
-            self._dati_giornalieri.append([d for d in dati if d.data == g])
+            self._dati_giornalieri.append(
+                [d for d in dati if d.data == g]
+            )
         self._best_sequenza = []
         self._best_costo = float("inf")
         self._ricorsione([], 0)
@@ -72,4 +73,6 @@ class Model:
         return costo
 
     def _get_citta_giorno(self, giorno):
-        return self._dati_giornalieri[giorno]
+        ordine = ["Milano", "Torino", "Genova"]
+        return sorted(self._dati_giornalieri[giorno],
+                      key=lambda x: ordine.index(x.localita))
